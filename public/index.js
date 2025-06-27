@@ -12,7 +12,7 @@ let palavraArray;
 let letrasEscolhidas = [];
 let tentativas = 6;
 
-let socket = io('http://localhost:3000');
+let socket = io();
 
 socket.on('jogorecebido',data=>{
 
