@@ -1,0 +1,93 @@
+.painel{
+    display: flex;
+}
+
+.letra-container{
+    display: inline-block;
+    width: 1.5em;
+    border-bottom: 5px solid #000;
+    margin: 0 .5em;
+    text-align: center;
+}
+
+.letra{
+    font-size: 2em;
+    visibility: hidden;
+}
+
+.letra-visible{
+    visibility: visible;
+}
+
+.letras-escolhidas{
+    min-height: 1.2em;
+}
+
+.desenho{
+    position: relative;
+}
+
+.estrutura{
+    width: 15em;
+}
+
+.cabeca{
+    width: 2em;
+    position: absolute;
+    top:5.8em;
+    left: 9.5em;
+    visibility: hidden;
+}
+
+.corpo{
+    width: 2em;
+    position: absolute;
+    top:7.65em;
+    left: 9.5em;
+    z-index: 100;
+    visibility: hidden;
+}
+
+.braco_1{
+    width: .9em;
+    position: absolute;
+    top:7.8em;
+    left: 8.9em;
+    transform: rotate(35deg);
+    z-index: 90;
+    visibility: hidden;
+}
+
+.braco_2{
+    width: .9em;
+    position: absolute;
+    top:7.8em;
+    left: 11em;
+    transform: rotate(-36deg);
+    z-index: 90;
+    visibility: hidden;
+}
+
+.perna_1{
+    width: .9em;
+    position: absolute;
+    top:10em;
+    left: 9.4em;
+    transform: rotate();
+    z-index: 90;
+    visibility: hidden;
+}
+
+.perna_2{
+    width: .9em;
+    position: absolute;
+    top:10em;
+    left: 10.8em;
+    transform: rotate();
+    z-index: 90;
+    visibility: hidden;
+}
+
+.img-visible{
+    visibility: visible;;
+}
