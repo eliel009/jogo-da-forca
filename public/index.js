@@ -3,183 +3,175 @@ const FormTemLetra = document.querySelector('.form-tem-letra');
 const BtnTemLetra = document.querySelector('.tem-letra');
 const letraEscolhidaText = document.querySelector('.letras-escolhidas');
 const letra = document.querySelector('.letra-digitada');
+const nomeJogadorEl = document.querySelector('.nome-jogador');
 const dicaText = document.querySelector('.dica');
 const painel = document.querySelector('.painel-palavra');
+const placar = document.querySelector('.placar');
+const formNomeJogador = document.querySelector('.form-nome-jogador');
 
 const imagens = ['perna_1','perna_2','braco_2','braco_1','corpo','cabeca'];
 
 let palavraArray;
 let letrasEscolhidas = [];
 let tentativas = 6;
+let nomeJogador;
 
 let socket = io();
 
-socket.on('jogorecebido',data=>{
+// Recebe informações do jogador (nome e pontos iniciais)
+socket.on('inforecebido', data => {
+    const jogadorExistente = document.querySelector(`[data-set-jogador="${data.nomeJogador}"]`);
 
+    if (!jogadorExistente) {
+        placar.innerHTML += `
+            <div class='info-jogador' data-set-jogador="${data.nomeJogador}">
+                <strong class='title-jogador'>${data.nomeJogador}</strong>: <span class='pontos'>${data.pontos}</span> Pontos
+            </div>`;
+    }
+});
+
+// Recebe nova rodada do jogo
+socket.on('jogorecebido', data => {
     resetJogo();
-
-    dicaText.textContent = `Dica: ${data.dica}`;
-
+    dicaText.textContent = retornaUpperCase(`Dica: ${data.dica}`);
     BtnTemLetra.disabled = false;
     letra.disabled = false;
-
     renderizaLetras(data.palavra);
-
     letra.focus();
+});
 
-})
-
-socket.on('verificadoLetra',data=>{
-
-    if(data.letra && data.letra.length==1 && data.letra != ' '){
-
+// Recebe letra digitada para mostrar nos campos da palavra
+socket.on('verificadoLetra', data => {
+    if (data.letra && data.letra.length == 1 && data.letra !== ' ') {
         verificaLetra(data.letra);
-
-    }
-    else{
-
+    } else {
         alert("Digite uma letra!");
-
-        letra.focus();
-
     }
 
-    letraEscolhidaText.textContent = letrasEscolhidas.join(',');
+    letraEscolhidaText.textContent = retornaUpperCase(letrasEscolhidas.join(','));
     letra.value = '';
     letra.focus();
+});
 
-})
+// Atualiza o placar quando alguém ganha
+socket.on('placarrecebido', data => {
+    const infoJogadorEl = document.querySelector(`[data-set-jogador="${data.nomeJogador}"]`);
 
-btnNovoJogo.addEventListener('click',event=>{
+    if (infoJogadorEl) {
+        infoJogadorEl.querySelector('.pontos').textContent = data.pontos;
+    } else {
+        placar.innerHTML += `
+            <div class='info-jogador' data-set-jogador="${data.nomeJogador}">
+                <strong class='title-jogador'>${data.nomeJogador}</strong>: <span class='pontos'>${data.pontos}</span> Pontos
+            </div>`;
+    }
 
-    let dica = prompt("Digite a dica!");
-    let palavra = prompt("Digite a palavra!");
+    alert(`${data.nomeJogador} completou a palavra e ganhou 10 pontos!`);
+});
 
-    if(!dica || !palavra) return;
-
-    let data = {dica,palavra};
-
-    socket.emit('jogoIniciado',data);
-
-})
-
-
-FormTemLetra.addEventListener('submit',event=>{
-
+// Cadastro do jogador
+formNomeJogador.addEventListener('submit', event => {
     event.preventDefault();
+    nomeJogador = nomeJogadorEl.value.trim() || "Jogador Desconhecido";
+    socket.emit('infojogador', { nomeJogador, pontos: 0 });
+});
 
-    socket.emit('temLetra',{letra:letra.value});
+// Início de uma nova rodada
+btnNovoJogo.addEventListener('click', () => {
+    let dica = retornaUpperCase(prompt("Digite a dica:"));
+    let palavra = retornaUpperCase(prompt("Digite a palavra:"));
 
-})
+    if (!dica || !palavra) return;
 
-function renderizaLetras(palavra){
+    socket.emit('jogoIniciado', { dica, palavra });
+});
 
+// Jogada: envia a letra
+FormTemLetra.addEventListener('submit', event => {
+    event.preventDefault();
+    socket.emit('temLetra', {
+        letra: retornaUpperCase(letra.value),
+        nomeJogador
+    });
+});
+
+// Funções auxiliares
+
+function renderizaLetras(palavra) {
+    palavra = retornaUpperCase(palavra);
+    palavraArray = palavra.split('');
     let spanColecao = "";
 
-    palavraArray = palavra.split('');
-
-    for(let letra of palavraArray){
-
-        spanColecao+=`<div class='letra-container'><span class='letra'>${letra}</span></div>`;
-
+    for (let letra of palavraArray) {
+        spanColecao += `<div class='letra-container'><span class='letra'>${letra}</span></div>`;
     }
 
     painel.innerHTML = spanColecao;
-
 }
 
-function verificaLetra(letra){
+function verificaLetra(letra) {
+    const letrasPalavra = [...document.querySelectorAll('.letra')];
+    const letrasDiv = letrasPalavra.filter(div => div.textContent === letra);
 
-    let letrasPalavra = [...document.querySelectorAll('.letra')];
-
-    let letrasDiv = letrasPalavra.filter(letraDiv=>letraDiv.textContent == letra);
-
-    if(!letrasDiv.length && !letrasEscolhidas.includes(letra)){
-
+    if (!letrasDiv.length && !letrasEscolhidas.includes(letra)) {
         naoTemLetra(letra);
-        
     }
 
-    for(let letraDiv of letrasDiv){
-
-        letraDiv.classList.add('letra-visible');
-
+    for (let div of letrasDiv) {
+        div.classList.add('letra-visible');
     }
 
-    verificaSeGanhou();
-
+    verificaSeGanhou(); // Apenas visual
 }
 
-function naoTemLetra(letra){
+function naoTemLetra(letra) {
+    letrasEscolhidas.push(retornaUpperCase(letra));
+    tentativas--;
 
-    letrasEscolhidas.push(letra);
-
-    tentativas-=1;
-
-    alert("não tem");
+    alert("Não tem essa letra!");
 
     exibeImagem();
-        
-    if(tentativas<=0){
 
+    if (tentativas <= 0) {
         perdeuJogo();
-
     }
-
 }
 
-function perdeuJogo(){
-
+function perdeuJogo() {
     BtnTemLetra.disabled = true;
-    letra.disabled = true
-
+    letra.disabled = true;
+    alert('Você perdeu!');
 }
 
-function verificaSeGanhou(){
+function verificaSeGanhou() {
+    const letrasElement = [...document.querySelectorAll('.letra')].filter(letraEl => letraEl.textContent !== ' ');
+    const ganhou = letrasElement.every(letraEl => letraEl.classList.contains('letra-visible'));
 
-    let letrasElement = [...document.querySelectorAll('.letra')].filter(letraElement=>{
-
-        return letraElement.textContent != ' ';
-
-    });
-
-
-    let ganhou = letrasElement.every(letraElement=>{
-
-        return letraElement.classList.contains('letra-visible');
-
-    })
-
-    if(ganhou){
-
-        alert('ganhou');
-
+    if (ganhou) {
+        BtnTemLetra.disabled = true;
+        letra.disabled = true;
+        // O servidor se encarrega de somar os pontos
     }
-
 }
 
-function resetJogo(){
-
+function resetJogo() {
     letraEscolhidaText.textContent = "";
-
     letrasEscolhidas = [];
-
     tentativas = 6;
 
     const containerDesenho = document.querySelector('.desenho');
-
-    [...containerDesenho.querySelectorAll('img')].forEach(img=>{
-
+    [...containerDesenho.querySelectorAll('img')].forEach(img => {
         img.classList.remove('img-visible');
-
-    })
-
+    });
 }
 
-function exibeImagem(){
+function exibeImagem() {
+    const imagem = document.querySelector(`.${imagens[tentativas]}`);
+    if (imagem) {
+        imagem.classList.add('img-visible');
+    }
+}
 
-    let imagem = document.querySelector(`.${imagens[tentativas]}`);
-
-    imagem.classList.add('img-visible');
-
+function retornaUpperCase(text) {
+    return text.toUpperCase();
 }

@@ -16,25 +16,52 @@ app.use('/',(req,res)=>{
     
 })
 
-io.on('connection',socket=>{
+let palavraAtual = "";
+let letrasCorretas = [];
+let jogadores = {};
 
-    console.log('conectado');
+io.on('connection', socket => {
+    socket.on('infojogador', data => {
+        jogadores[data.nomeJogador] = { pontos: data.pontos || 0 };
+        io.emit('inforecebido', data);
+    });
 
-    socket.on('jogoIniciado',data=>{
+    socket.on('jogoIniciado', data => {
+        palavraAtual = data.palavra.toUpperCase();
+        letrasCorretas = [];
+        io.emit('jogorecebido', data);
+    });
 
-        console.log(data);
+    socket.on('temLetra', data => {
+        const letra = data.letra;
+        const nome = data.nomeJogador;
 
-        io.emit('jogorecebido',data);
+        const palavraArray = palavraAtual.split('');
 
-    })
+        if (!letra || letra.length !== 1 || letra === ' ') return;
 
-    socket.on('temLetra',data=>{
+        io.emit('verificadoLetra', { letra }); // Atualiza a letra para todos
 
-        console.log(data);
-        io.emit('verificadoLetra',data);
+        // Verifica se a letra está na palavra e adiciona
+        if (palavraArray.includes(letra) && !letrasCorretas.includes(letra)) {
+            letrasCorretas.push(letra);
+        }
 
-    })
-})
+        // Verifica se todas as letras foram adivinhadas
+        const letrasUniques = [...new Set(palavraArray.filter(l => l !== ' '))];
+        const todasAdivinhadas = letrasUniques.every(l => letrasCorretas.includes(l));
+
+        if (todasAdivinhadas) {
+            // Soma os pontos do jogador
+            jogadores[nome].pontos += 10;
+
+            io.emit('placarrecebido', {
+                nomeJogador: nome,
+                pontos: jogadores[nome].pontos
+            });
+        }
+    });
+});
+
 
 server.listen(3000);
-
