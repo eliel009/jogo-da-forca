@@ -1,93 +1,319 @@
-.painel{
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: #f0f2f5;
+    color: #333;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+    min-height: 100vh;
 }
 
-.letra-container{
-    display: inline-block;
-    width: 1.5em;
-    border-bottom: 5px solid #000;
-    margin: 0 .5em;
+/* Container geral */
+.container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 2em;
+    max-width: 600px;
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+/* Formulário nome */
+.form-nome-jogador {
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.form-nome-jogador input[type="text"] {
+    padding: 0.5em;
+    font-size: 1em;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.form-nome-jogador input[type="submit"] {
+    padding: 0.5em;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-nome-jogador input[type="submit"]:hover {
+    background: #0056b3;
+}
+
+/* Botão novo jogo */
+.novo-jogo {
+    margin-bottom: 1em;
+    padding: 0.6em 1.2em;
+    background: #28a745;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.novo-jogo:hover {
+    background: #218838;
+}
+
+/* Dica */
+.dica {
+    font-size: 1.4em;
+    margin-bottom: 1em;
+    color: #555;
+}
+
+/* Letras já escolhidas */
+.letras-escolhidas {
+    min-height: 1.2em;
+    font-size: 1.2em;
+    color: #888;
+    margin-bottom: 1em;
+}
+
+/* Form de letra */
+.form-tem-letra {
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.letra-digitada {
+    padding: 0.5em;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    width: 3em;
     text-align: center;
+    border: 2px solid #aaa;
+    border-radius: 6px;
 }
 
-.letra{
-    font-size: 2em;
+.tem-letra {
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background: #ffc107;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.tem-letra:hover {
+    background: #e0a800;
+}
+
+/* Palavras */
+.painel-palavra {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    margin-top: 1em;
+}
+
+.letra-container {
+    display: inline-block;
+    width: 2em;
+    border-bottom: 4px solid #222;
+    text-align: center;
+    padding: 0.2em;
+}
+
+.letra {
+    font-size: 1.8em;
     visibility: hidden;
 }
 
-.letra-visible{
+.letra-visible {
     visibility: visible;
 }
 
-.letras-escolhidas{
-    min-height: 1.2em;
-}
-
-.desenho{
+/* Forca (desenho) */
+.desenho {
     position: relative;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.estrutura{
+.estrutura {
     width: 15em;
 }
 
-.cabeca{
-    width: 2em;
+.cabeca, .corpo, .braco_1, .braco_2, .perna_1, .perna_2 {
     position: absolute;
-    top:5.8em;
-    left: 9.5em;
     visibility: hidden;
 }
 
-.corpo{
+.cabeca {
     width: 2em;
-    position: absolute;
-    top:7.65em;
+    top: 5.8em;
+    left: 9.5em;
+}
+
+.corpo {
+    width: 2em;
+    top: 7.65em;
     left: 9.5em;
     z-index: 100;
-    visibility: hidden;
 }
 
-.braco_1{
-    width: .9em;
-    position: absolute;
-    top:7.8em;
+.braco_1 {
+    width: 0.9em;
+    top: 7.8em;
     left: 8.9em;
     transform: rotate(35deg);
     z-index: 90;
-    visibility: hidden;
 }
 
-.braco_2{
-    width: .9em;
-    position: absolute;
-    top:7.8em;
+.braco_2 {
+    width: 0.9em;
+    top: 7.8em;
     left: 11em;
     transform: rotate(-36deg);
     z-index: 90;
-    visibility: hidden;
 }
 
-.perna_1{
-    width: .9em;
-    position: absolute;
-    top:10em;
+.perna_1 {
+    width: 0.9em;
+    top: 10em;
     left: 9.4em;
-    transform: rotate();
     z-index: 90;
-    visibility: hidden;
 }
 
-.perna_2{
-    width: .9em;
-    position: absolute;
-    top:10em;
+.perna_2 {
+    width: 0.9em;
+    top: 10em;
     left: 10.8em;
-    transform: rotate();
     z-index: 90;
+}
+
+.img-visible {
+    visibility: visible;
+}
+
+/* Placar */
+.placar {
+    background: #fff;
+    padding: 1em;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+.info-jogador {
+    font-size: 1.1em;
+    padding: 0.5em 0;
+    border-bottom: 1px solid #eee;
+}
+
+.title-jogador {
+    font-weight: bold;
+    color: #333;
+}
+
+/* ... (mantém o restante do CSS moderno acima como está) ... */
+
+/* Forca (desenho) */
+.desenho {
+    position: relative;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    margin-left: 9em;
+    width: 15em;
+    height: 20em;
+}
+
+/* Estrutura da forca */
+.estrutura {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Partes do corpo fixas na posição */
+.cabeca,
+.corpo,
+.braco_1,
+.braco_2,
+.perna_1,
+.perna_2 {
+    position: absolute;
     visibility: hidden;
 }
 
-.img-visible{
-    visibility: visible;;
+/* Cabeça */
+.cabeca {
+    width: 2em;
+    top: 5.8em;
+    left: 9.5em;
+}
+
+/* Corpo */
+.corpo {
+    width: 2em;
+    top: 7.65em;
+    left: 9.5em;
+    z-index: 100;
+}
+
+/* Braço esquerdo */
+.braco_1 {
+    width: 0.9em;
+    top: 7.8em;
+    left: 8.9em;
+    transform: rotate(35deg);
+    z-index: 90;
+}
+
+/* Braço direito */
+.braco_2 {
+    width: 0.9em;
+    top: 7.8em;
+    left: 11em;
+    transform: rotate(-36deg);
+    z-index: 90;
+}
+
+/* Perna esquerda */
+.perna_1 {
+    width: 0.9em;
+    top: 10em;
+    left: 9.4em;
+    z-index: 90;
+}
+
+/* Perna direita */
+.perna_2 {
+    width: 0.9em;
+    top: 10em;
+    left: 10.8em;
+    z-index: 90;
+}
+
+/* Imagem visível */
+.img-visible {
+    visibility: visible;
 }
