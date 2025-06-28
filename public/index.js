@@ -50,7 +50,6 @@ socket.on('verificadoLetra', data => {
 
     letraEscolhidaText.textContent = retornaUpperCase(letrasEscolhidas.join(','));
     letra.value = '';
-    letra.focus();
 });
 
 // Atualiza o placar quando alguém ganha
