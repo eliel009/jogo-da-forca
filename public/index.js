@@ -97,7 +97,7 @@ FormTemLetra.addEventListener('submit', event => {
 // Funções auxiliares
 
 function renderizaLetras(palavra) {
-    palavra = retornaUpperCase(palavra);
+    palavra = retornaUpperCase(palavra).replace(' ','');
     palavraArray = palavra.split('');
     let spanColecao = "";
 
