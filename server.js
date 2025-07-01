@@ -10,58 +10,92 @@ app.set('views',path.join(__dirname,'public'));
 app.engine('html',require('ejs').renderFile);
 app.set('view engine','html');
 
+let jogadores = {};
+let palavraArray;
+let letrasAcertadas = [];
+
 app.use('/',(req,res)=>{
 
     res.render('index.html');
     
 })
 
-let palavraAtual = "";
-let letrasCorretas = [];
-let jogadores = {};
+io.on('connection',socket=>{
 
-io.on('connection', socket => {
-    socket.on('infojogador', data => {
-        jogadores[data.nomeJogador] = { pontos: data.pontos || 0 };
-        io.emit('inforecebido', data);
-    });
+    socket.on('infojogador',data=>{
 
-    socket.on('jogoIniciado', data => {
-        palavraAtual = data.palavra.toUpperCase();
-        letrasCorretas = [];
-        io.emit('jogorecebido', data);
-    });
+        let pontos = 0;
+        let jogador = data.nomeJogador;
 
-    socket.on('temLetra', data => {
-        const letra = data.letra;
-        const nome = data.nomeJogador;
+        jogadores[jogador]=pontos;
 
-        const palavraArray = palavraAtual.split('');
+        io.emit('inforecebido',{jogador,pontos});
 
-        if (!letra || letra.length !== 1 || letra === ' ') return;
+    })
 
-        io.emit('verificadoLetra', { letra }); // Atualiza a letra para todos
+    socket.on('jogoIniciado',data=>{
 
-        // Verifica se a letra está na palavra e adiciona
-        if (palavraArray.includes(letra) && !letrasCorretas.includes(letra)) {
-            letrasCorretas.push(letra);
+        palavraArray = data.palavra.split('');
+        letrasAcertadas = [];
+
+        io.emit('jogorecebido',data);
+
+    })
+
+    socket.on('temLetra',data=>{
+
+        let jogador = data.nomeJogador;
+
+        if(palavraArray.includes(data.letra)){
+
+            letrasAcertadas.push(data.letra);
+
+            let letra = data.letra;
+            let posicoes = [];
+
+            palavraArray.forEach((letraArray,posicao)=>{
+
+                if(letraArray==letra)  posicoes.push(posicao);
+
+            })
+
+            io.emit('verificadoLetra',{letra,posicoes});
+
+                let ganhou = palavraArray.every(letraPalavra=>{
+
+                    return letrasAcertadas.includes(letraPalavra);
+
+                })
+
+                if(ganhou){
+
+                    jogadores[jogador]+=10;
+
+                    console.log(jogador);
+
+                    io.emit('ganhou',{jogadores,jogador});
+
+                }
+
+        }
+        else{
+
+            io.emit('naotemletra',data);
+
         }
 
-        // Verifica se todas as letras foram adivinhadas
-        const letrasUniques = [...new Set(palavraArray.filter(l => l !== ' '))];
-        const todasAdivinhadas = letrasUniques.every(l => letrasCorretas.includes(l));
+    })
 
-        if (todasAdivinhadas) {
-            // Soma os pontos do jogador
-            jogadores[nome].pontos += 10;
+    socket.on('atualizaplacar',data=>{
 
-            io.emit('placarrecebido', {
-                nomeJogador: nome,
-                pontos: jogadores[nome].pontos
-            });
-        }
-    });
-});
+        jogadores[data.nomeJogador]+=10;
 
+        console.log(jogadores);
+
+        //io.emit('placarrecebido',data);
+
+    })
+})
 
 server.listen(3000);
+
