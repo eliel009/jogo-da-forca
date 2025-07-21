@@ -13,6 +13,7 @@ app.set('view engine','html');
 let jogadores = {};
 let palavraArray;
 let letrasAcertadas = [];
+let letrasJogo = [];
 
 app.use('/',(req,res)=>{
 
@@ -46,6 +47,8 @@ io.on('connection',socket=>{
 
         let jogador = data.nomeJogador;
 
+        letrasJogo.push(data.letra);
+
         if(palavraArray.includes(data.letra)){
 
             letrasAcertadas.push(data.letra);
@@ -59,7 +62,7 @@ io.on('connection',socket=>{
 
             })
 
-            io.emit('verificadoLetra',{letra,posicoes});
+            io.emit('verificadoLetra',{letra,posicoes,letrasJogo});
 
                 let ganhou = palavraArray.every(letraPalavra=>{
 

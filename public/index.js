@@ -44,6 +44,10 @@ socket.on('jogorecebido',data=>{
 
 socket.on('verificadoLetra',infoletra=>{
 
+    letraEscolhidaText.textContent = infoletra.letrasJogo.join(',');
+
+    console.log(infoletra);
+
     verificaLetra(infoletra);
 
 })
@@ -128,8 +132,6 @@ function naoTemLetra(letra){
     letrasEscolhidas.push(retornaUpperCase(letra));
 
     tentativas-=1;
-
-    alert("não tem");
 
     exibeImagem();
         
