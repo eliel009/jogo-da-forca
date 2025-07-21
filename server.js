@@ -38,16 +38,34 @@ io.on('connection',socket=>{
 
         palavraArray = data.palavra.split('');
         letrasAcertadas = [];
+        letrasJogo = [];
 
         io.emit('jogorecebido',data);
 
     })
 
+    // socket.on('perdeujogo',(jogador)=>{
+
+    //     console.log(jogador);
+
+    // })
+
     socket.on('temLetra',data=>{
 
         let jogador = data.nomeJogador;
 
-        letrasJogo.push(data.letra);
+        let jaTemLetra = letrasJogo.includes(data.letra);
+
+        if(!jaTemLetra){
+
+            letrasJogo.push(data.letra);
+
+        }
+        else{
+
+            return;
+
+        }
 
         if(palavraArray.includes(data.letra)){
 
@@ -62,9 +80,11 @@ io.on('connection',socket=>{
 
             })
 
-            io.emit('verificadoLetra',{letra,posicoes,letrasJogo});
+            io.emit('verificadoLetra',{letra,posicoes});
 
-                let ganhou = palavraArray.every(letraPalavra=>{
+                let novaPalavra = palavraArray.join('').replaceAll(' ','').split('');
+
+                let ganhou = novaPalavra.every(letraPalavra=>{
 
                     return letrasAcertadas.includes(letraPalavra);
 
@@ -73,8 +93,6 @@ io.on('connection',socket=>{
                 if(ganhou){
 
                     jogadores[jogador]+=10;
-
-                    console.log(jogador);
 
                     io.emit('ganhou',{jogadores,jogador});
 
@@ -87,15 +105,13 @@ io.on('connection',socket=>{
 
         }
 
+        io.emit('atualizaletrasjogo',{letrasJogo});
+
     })
 
     socket.on('atualizaplacar',data=>{
 
         jogadores[data.nomeJogador]+=10;
-
-        console.log(jogadores);
-
-        //io.emit('placarrecebido',data);
 
     })
 })

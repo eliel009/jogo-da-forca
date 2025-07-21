@@ -44,8 +44,6 @@ socket.on('jogorecebido',data=>{
 
 socket.on('verificadoLetra',infoletra=>{
 
-    letraEscolhidaText.textContent = infoletra.letrasJogo.join(',');
-
     console.log(infoletra);
 
     verificaLetra(infoletra);
@@ -59,6 +57,12 @@ socket.on('ganhou',data=>{
 socket.on('naotemletra',data=>{
 
     naoTemLetra(data.letra);
+
+})
+
+socket.on('atualizaletrasjogo',data=>{
+
+    letraEscolhidaText.textContent = data.letrasJogo.join(',');
 
 })
 
@@ -76,8 +80,8 @@ formNomeJogador.addEventListener('submit',event=>{
 
 btnNovoJogo.addEventListener('click',event=>{
 
-    let dica = retornaUpperCase(prompt("Digite a dica!"));
-    let palavra = retornaUpperCase(prompt("Digite a palavra!"));
+    let dica = retornaUpperCase(prompt("Digite a dica!").trim().trimStart());
+    let palavra = retornaUpperCase(prompt("Digite a palavra!").trim().trimStart());
 
     if(!dica || !palavra) return;
 
@@ -90,6 +94,8 @@ btnNovoJogo.addEventListener('click',event=>{
 FormTemLetra.addEventListener('submit',event=>{
 
     event.preventDefault();
+
+    if(!letra.value) return;
 
     socket.emit('temLetra',{letra:retornaUpperCase(letra.value),nomeJogador});
 
@@ -107,7 +113,18 @@ function renderizaLetras(palavra){
 
     for(let letra of palavraArray){
 
-        spanColecao+=`<div class='letra-container'><span class='letra'>${letra}</span></div>`;
+        if(letra == ' '){
+
+            spanColecao+=`<div class='letra-container blanc'><span class='letra'>${letra}</span></div>`;
+
+        }
+        else{
+
+            spanColecao+=`<div class='letra-container'><span class='letra'>${letra}</span></div>`;
+
+        }
+
+        
 
     }
 
